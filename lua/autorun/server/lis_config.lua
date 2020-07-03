@@ -1,3 +1,5 @@
+-- Server-side CFG
+
 LIS = {}
 LIS.CONFIG = {}
 
