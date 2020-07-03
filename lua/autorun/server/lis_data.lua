@@ -26,7 +26,7 @@ local meta = FindMetaTable("Player")
 
 function meta:LIS_CreateInventory()
     local ID = string.Replace(self:SteamID(), ":", "_")
-    local path = LIS.CONFIG.SavePath.."/players/"..ID..".txt"
+    local path = LIS.CONFIG.SavePath.."/players/"..ID..".json"
     
 	if file.Exists(path, "DATA") then
 		self.LIS = {}
@@ -46,5 +46,5 @@ function meta:LIS_SaveInventory()
 	if !(self.LIS) or !(self.LIS.Inventory) then self:LIS_CreateInventory() end
 
 	local ID = string.Replace(self:SteamID(), ":", "_")
-	file.Write(LIS.CONFIG.SavePath.."/players/"..ID..".txt", util.TableToJSON(self:LIS_GetInventory()))
+	file.Write(LIS.CONFIG.SavePath.."/players/"..ID..".json", util.TableToJSON(self:LIS_GetInventory()))
 end
