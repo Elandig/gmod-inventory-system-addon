@@ -2,6 +2,8 @@ LIS = {}
 LIS.CONFIG = {}
 
 LIS.CONFIG.SavePath = "lucid_inventory"
+LIS.CONFIG.PickupSound = "items/ammo_pickup.wav"
+LIS.CONFIG.InventoryStyle = 1
 LIS.CONFIG.DisallowPickupForEntityGroup = {"func_", "door_", "prop_", "npc_", "env_", "path_", "edit_"}
 LIS.CONFIG.DisallowPickup = {	
     ["fadmin_jail"] = true,

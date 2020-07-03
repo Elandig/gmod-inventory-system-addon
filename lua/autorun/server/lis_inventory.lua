@@ -1,38 +1,22 @@
 util.AddNetworkString("LIS_DropInventoryItem")
-
-hook.Add("PlayerUse", "LIS_PickupEntity", function(ply, ent)
-    if ply.LIS.CanUse then 
-        ply.LIS.CanUse = false
-        local entity = duplicator.CopyEntTable( ent )
-        for _, v in pairs(LIS.CONFIG.DisallowPickupForEntityGroup) do
-            if string.find(entity.Class, v) then return false end
-        end
-        for _,v in pairs(LIS.CONFIG.DisallowPickup) do
-            if entity.Class == v then return false end
-        end
-
-        ply:LIS_AddInventoryItem(entity)
-        ent:Remove()
-        timer.Simple(1, function() if !ply.LIS.CanUse then ply.LIS.CanUse = true end end)
-    end
-end)
+util.AddNetworkString("LIS_DrawPlayerInventory")
 
 net.Receive("LIS_DropInventoryItem", function(len, ply)
     local id = net.ReadUInt(16)
-    
+
     LIS_DropItem(ply, "lis_inventory_drop", {id})
 end)
 
-local meta = FindMetaTable("Player")
-
-function meta:LIS_AddInventoryItem(tbl)
-    table.insert( self.LIS.Inventory, tbl)
-
-    self:LIS_SaveInventory()
-end
-
 function LIS_OpenInventory(ply)
-    PrintTable(ply:LIS_GetInventory())
+    local data = {}
+    for _,v in pairs(ply:LIS_GetInventory()) do
+        table.insert( data, {v.Class, v.Model})
+    end
+
+    net.Start("LIS_DrawPlayerInventory")
+    net.WriteUInt(LIS.CONFIG.InventoryStyle, 16)
+    net.WriteTable(data)
+	net.Send(ply)
 end
 
 function LIS_DropItem(ply, cmd, args)
@@ -55,6 +39,18 @@ function LIS_DeleteInventory(ply)
     if ply:IsAdmin() then ply.LIS.Inventory = {} end
     ply:LIS_SaveInventory()
     ply:LIS_CreateInventory()
+end
+
+local meta = FindMetaTable("Player")
+
+function meta:LIS_ValidateInventory()
+    if !(self.LIS) then self.LIS = {Inventory = {}} end
+end
+
+function meta:LIS_AddInventoryItem(tbl)
+    self:LIS_ValidateInventory()
+    table.insert( self.LIS.Inventory, tbl)
+    self:LIS_SaveInventory()
 end
 
 concommand.Add("lis_inventory_delete", LIS_DeleteInventory)
