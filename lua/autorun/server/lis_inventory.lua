@@ -1,6 +1,23 @@
 util.AddNetworkString("LIS_DropInventoryItem")
 util.AddNetworkString("LIS_DrawPlayerInventory")
 
+hook.Add("PlayerSpawn", "LIS_GiveSWEP", function(ply)
+    if LIS.CONFIG.SpawnWithSWEP then
+        ply:Give("swep_inventory")
+    end
+end)
+
+hook.Add("PlayerDeath", "LIS_DropInventoryOnDeath", function(ply, inflictor,attacker)
+    if LIS.CONFIG.DropInventoryOnDeath then 
+        local backpack = ents.Create("lis_backpack")
+        backpack.Table = ply:LIS_GetInventory()
+        backpack:SetPos(ply:GetPos())
+        backpack:Spawn()
+
+        LIS_DeleteInventory(ply)
+    end
+end)
+
 net.Receive("LIS_DropInventoryItem", function(len, ply)
     local id = net.ReadUInt(16)
 
@@ -36,7 +53,7 @@ function LIS_DropItem(ply, cmd, args)
 end
 
 function LIS_DeleteInventory(ply)
-    if ply:IsAdmin() then ply.LIS.Inventory = {} end
+    ply.LIS.Inventory = {}
     ply:LIS_SaveInventory()
     ply:LIS_CreateInventory()
 end
@@ -45,6 +62,26 @@ local meta = FindMetaTable("Player")
 
 function meta:LIS_ValidateInventory()
     if !(self.LIS) then self.LIS = {Inventory = {}} end
+end
+
+function meta:LIS_PickupItem()
+    local ent = self:GetEyeTrace().Entity
+    if !ent or !ent:IsValid() or ent:IsPlayer() or ent:IsNPC() then return false end
+
+    if self:GetPos():Distance(ent:GetPos()) < LIS.CONFIG.PickupDistance then
+        local entity = duplicator.CopyEntTable( ent )
+        for _, v in pairs(LIS.CONFIG.DisallowPickupForEntityGroup) do
+            if string.find(entity.Class, v) then return false end
+        end
+        for _,v in pairs(LIS.CONFIG.DisallowPickup) do
+            if entity.Class == v then return false end
+        end
+
+        self:LIS_AddInventoryItem(entity)
+
+        ent:Remove()
+        self:EmitSound(LIS.CONFIG.PickupSound, 100, 100)
+    end
 end
 
 function meta:LIS_AddInventoryItem(tbl)

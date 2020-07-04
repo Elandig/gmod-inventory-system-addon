@@ -6,6 +6,9 @@ LIS.CONFIG = {}
 LIS.CONFIG.SavePath = "lucid_inventory"
 LIS.CONFIG.PickupSound = "items/ammo_pickup.wav"
 LIS.CONFIG.InventoryStyle = 1
+LIS.CONFIG.PickupDistance = 100
+LIS.CONFIG.SpawnWithSWEP = true -- Give Inventory SWEP on spawn
+
 LIS.CONFIG.DisallowPickupForEntityGroup = {"func_", "door_", "prop_", "npc_", "env_", "path_", "edit_"}
 LIS.CONFIG.DisallowPickup = {	
     ["fadmin_jail"] = true,
@@ -30,3 +33,8 @@ LIS.CONFIG.DisallowPickup = {
     ["gmod_emitter"] = true,
     ["sent_ball"] = true
 }
+
+----- Drop Inventory On Death -----
+LIS.CONFIG.DropInventoryOnDeath = true
+LIS.CONFIG.DropInventoryModel = "models/Items/item_item_crate.mdl"
+LIS.CONFIG.DropInventoryTimer = 10
