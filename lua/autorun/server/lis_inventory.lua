@@ -38,16 +38,36 @@ end
 
 function LIS_DropItem(ply, cmd, args)
     local id = tonumber( args[1], 10 )
+    local item = ply:LIS_GetInventory()[id]
     if !id or ply:LIS_GetInventory()[id] == nil then print("Nope!") return end
 
-    local pos = ply:EyePos()
-	local tracedata = {start = pos, endpos = pos+(ply:GetForward()*40), filter = ply}
+    --[=[local pos = ply:EyePos()
+	local tracedata = {start = ply:EyePos(), endpos = pos+ply:GetAimVector() * 85, filter = ply}
 	local tr = util.TraceLine(tracedata)
 
     local Entity = duplicator.CreateEntityFromTable( ply, ply:LIS_GetInventory()[id])
+    table.Merge(Entity:GetTable(), ply:LIS_GetInventory()[id])
     Entity:SetPos(tr.HitPos + tr.HitNormal*10)
     Entity:Spawn()
-    Entity:Activate() 
+    Entity:Activate() ]=]
+
+    local Entity = ents.Create(item.Class)
+    duplicator.DoGeneric(Entity, item)
+    Entity:Spawn()
+    Entity:Activate()
+
+    duplicator.DoGenericPhysics(Entity, ply, item)
+    table.Merge(Entity:GetTable(), item)
+
+    local tracedata = {}
+    tracedata.start = ply:EyePos()
+    tracedata.endpos = tracedata.start + ply:GetAimVector() * 80
+    tracedata.filter = ply
+
+	local tr = util.TraceLine(tracedata)
+
+    Entity:SetPos(tr.HitPos)
+
     table.remove( ply.LIS.Inventory, id)
     ply:LIS_SaveInventory()
 end
