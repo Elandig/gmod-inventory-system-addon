@@ -44,7 +44,6 @@ function PANEL:AddItems(data)
         local l_page_ind = 0
         for i, v in pairs(data) do
 
-            -- Responsive item list
             local item = vgui.Create("DPanel", self.canvas)
             item:SetSize(rw*icon_size, rh*icon_size)
 
@@ -55,7 +54,6 @@ function PANEL:AddItems(data)
             
             item:SetPos(rw*offset*1.5+rw*SO*(ind-7*math.floor(ind/max_columns)-1)+rw*width*page, rh*SO*1.2+rh*SO*(math.floor(ind/max_columns)-1))
 
-            -- Item model
             local icon = vgui.Create("SpawnIcon", item)
             icon:SetSize(rw*icon_size, rh*icon_size)
             icon:SetModel(v[2])
@@ -68,11 +66,9 @@ function PANEL:AddItems(data)
             end
             local function prevPage()
                 local x, y = self.canvas:GetPos()
-                local w, h = self.canvas:GetSize()
                 self.canvas:MoveTo(x+width, y, 0.25)
             end
 
-            -- Handle click
             function icon:DoClick()
                 net.Start("LIS_DropInventoryItem")
                 net.WriteUInt(i, 16)
