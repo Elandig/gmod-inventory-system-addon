@@ -31,7 +31,7 @@ function PANEL:nextPage()
     local w, h = self.canvas:GetSize()
     local AR = self:GetListAspectRatio()
 
-    self.canvas:MoveTo(x-width, y, 0.25, 0, -1)
+    self.canvas:MoveTo(x-width, y, LIS.CONFIG.ScrollAnimationTime or 0.25, 0, -1)
     self.page = self.page + 1
 
 end
@@ -41,7 +41,7 @@ function PANEL:prevPage()
     local width, _ = self:GetSize()
     local x, y = self.canvas:GetPos()
 
-    self.canvas:MoveTo(x+width, y, 0.25, 0, -1)
+    self.canvas:MoveTo(x+width, y, LIS.CONFIG.ScrollAnimationTime or 0.25, 0, -1)
     self.page = self.page - 1
 
 end
@@ -58,7 +58,7 @@ function PANEL:OnMouseWheeled(dt)
 
         -- Input lock to prevent user from breaking the GUI during the animation
         self.lock = true
-        timer.Simple(0.5, function()
+        timer.Simple(0.25+LIS.CONFIG.ScrollAnimationTime, function()
             self.lock = false
         end)
 
@@ -76,12 +76,13 @@ function PANEL:AddItems(data)
     local max_columns = AR[1]+.000001
 
     self.page = 0
-    self.size = #data
-    self.pages = math.floor(self.size/(AR[1]*AR[2]))
 
     local function resizeCanvas()
 
         local w, h = self.canvas:GetSize()
+
+        self.size = #data
+        self.pages = math.floor((self.size-1)/(AR[1]*AR[2]))
         self.canvas:SetSize(w+w*(self.pages+1), h)
 
     end
@@ -93,6 +94,8 @@ function PANEL:AddItems(data)
         self.canvas:SetPos(x-width*self.page, y)
 
     end
+
+    local function isAnimLocked() return self.lock end
 
     local function createItemList(state)
 
@@ -106,6 +109,11 @@ function PANEL:AddItems(data)
             restorePage()
         else
             self.page = 0
+        end
+
+        if self.page > self.pages then
+            self.lock = false
+            self:prevPage()
         end
 
         local items = {}
@@ -135,7 +143,7 @@ function PANEL:AddItems(data)
 
             function icon:DoClick()
 
-                if self.lock then return end
+                if isAnimLocked() then return end
 
                 net.Start("LIS_DropInventoryItem")
                 net.WriteUInt(i, 16)
