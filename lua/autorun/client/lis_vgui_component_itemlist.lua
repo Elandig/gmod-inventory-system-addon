@@ -124,7 +124,10 @@ function PANEL:AddItems(data)
 
             ind = i - AR[1]*AR[2] * page
 
-            item:SetPos(rw*offset*1.5+rw*SO*(ind-max_columns*math.floor(ind/max_columns)-1)+rw*width*page, rh*SO*1.2+rh*SO*(math.floor(ind/max_columns)-1)-rh*offset)
+            local offset_x = (width-rw*(SO*AR[1]-offset))/2
+            local offset_y = (height-rh*(SO*AR[2]-offset))/2
+            
+            item:SetPos(offset_x+rw*SO*(ind-max_columns*math.floor(ind/max_columns)-1)+rw*width*page, rh*SO+rh*SO*(math.floor(ind/max_columns)-1)+offset_y)
 
             local icon = vgui.Create("SpawnIcon", item)
             icon:SetSize(rw*icon_size, rh*icon_size)
