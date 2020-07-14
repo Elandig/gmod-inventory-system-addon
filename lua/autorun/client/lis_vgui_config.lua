@@ -15,4 +15,5 @@ LIS.CONFIG.SecondaryAccentColor = {66, 66, 72,255} -- Secondary Accent Colour
 --LIS.CONFIG.BaseWindowBackgroundColor = {66, 66, 72, 217} -- Base Window Background Colour
 
 -- Animation
-LIS.CONFIG.AnimationTime = 0.25 -- Open/Close Animation (0 to disable)
+LIS.CONFIG.OpeningAnimationTime = 0.25 -- Open/Close Animation (0 to disable)
+LIS.CONFIG.ScrollAnimationTime = 0.25 -- Page scroll Animation (0 to disable)

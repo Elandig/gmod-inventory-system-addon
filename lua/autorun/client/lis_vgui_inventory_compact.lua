@@ -7,7 +7,7 @@ function LIS.CreateCompactInventory(data)
     local rw, rh = ScrW()/1920, ScrH()/1080
     local width, height = 960, 300
     local pos_x, pos_y = 480, 780
-    local anim_time = LIS.CONFIG.AnimationTime or 0.25
+    local anim_time = LIS.CONFIG.OpeningAnimationTime or 0.25
 
     surface.CreateFont("Font", {font = "Arial",extended = false,size = 20})
     
