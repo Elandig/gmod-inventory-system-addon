@@ -27,47 +27,6 @@ function LIS.CreateCompactInventory(data)
     itemlist:SetSize(rw*b_width, rh*b_height)
     itemlist:AddItems(data)
 
-    -- Item list constructor
-    --[[local function createItemList(scroll_pos)
-
-        -- Constants
-        local size = 120
-        local space = 13
-        local max_columns = 7+.000001
-        local max_rows = 2
-
-        local items = {}
-        local page = 1
-        local l_page_ind = 0
-        for i, v in pairs(data) do
-
-            -- Responsive item list
-            local item = vgui.Create("DPanel", frame)
-            item:SetSize(rw*size, rh*size)
-            local ind = i - l_page_ind * page
-            if ind > max_columns*max_rows then
-                page = page + 1
-            end
-            item:SetPos(rw*space*1.5+rw*(size+space)*(ind-7*math.floor(ind/max_columns)-1), rh*(size+space)*1.2+rh*(size+space)*(math.floor(ind/max_columns)-1))
-
-            -- Item model
-            local icon = vgui.Create("SpawnIcon", item)
-            icon:SetSize(rw*size, rh*size)
-            icon:SetModel(v[2])
-
-            -- Handle click
-            function icon:DoClick()
-                net.Start("LIS_DropInventoryItem")
-                net.WriteUInt(i, 16)
-                net.SendToServer()
-                table.remove(data, i)
-                item:Remove()
-                createItemList()
-            end
-        end
-    end
-    createItemList()]]
-
     -- Optional mouse toggle closing
     if LIS.CONFIG.MouseToggle then
         hook.Add("GUIMousePressed", "closeCompactInventory", function(cmd)
