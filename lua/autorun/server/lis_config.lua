@@ -9,6 +9,9 @@ LIS.CONFIG.InventoryStyle = 1
 LIS.CONFIG.PickupDistance = 100
 LIS.CONFIG.SpawnWithSWEP = true -- Give Inventory SWEP on spawn
 
+LIS.CONFIG.AllowDropAmmo = true
+LIS.CONFIG.MaxAmmoBoxCount = 5
+
 LIS.CONFIG.DisallowPickupForEntityGroup = {"func_", "door_", "prop_", "npc_", "env_", "path_", "edit_"}
 LIS.CONFIG.DisallowPickup = {	
     ["fadmin_jail"] = true,

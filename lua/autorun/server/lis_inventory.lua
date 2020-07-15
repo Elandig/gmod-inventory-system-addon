@@ -41,16 +41,6 @@ function LIS_DropItem(ply, cmd, args)
     local item = ply:LIS_GetInventory()[id]
     if !id or ply:LIS_GetInventory()[id] == nil then print("Nope!") return end
 
-    --[=[local pos = ply:EyePos()
-	local tracedata = {start = ply:EyePos(), endpos = pos+ply:GetAimVector() * 85, filter = ply}
-	local tr = util.TraceLine(tracedata)
-
-    local Entity = duplicator.CreateEntityFromTable( ply, ply:LIS_GetInventory()[id])
-    table.Merge(Entity:GetTable(), ply:LIS_GetInventory()[id])
-    Entity:SetPos(tr.HitPos + tr.HitNormal*10)
-    Entity:Spawn()
-    Entity:Activate() ]=]
-
     local Entity = ents.Create(item.Class)
     duplicator.DoGeneric(Entity, item)
     Entity:Spawn()
@@ -70,6 +60,31 @@ function LIS_DropItem(ply, cmd, args)
 
     table.remove( ply.LIS.Inventory, id)
     ply:LIS_SaveInventory()
+end
+
+function LIS_DropAmmo(ply)
+    if !LIS.CONFIG.AllowDropAmmo then return false end
+    if !ply.LIS.Ammo then ply.LIS.Ammo = 0 end
+    if  ply.LIS.Ammo >= LIS.CONFIG.MaxAmmoBoxCount then return false end
+
+    local ammo = "Pistol"
+    local count = 5
+
+    local Entity = ents.Create("ent_lis_ammobox")
+    Entity.AmmoType = ammo
+	Entity.AmmoCount = count
+    Entity:SetOwner(ply)
+    Entity:Spawn()
+    Entity:Activate()
+    
+    local tracedata = {}
+    tracedata.start = ply:EyePos()
+    tracedata.endpos = tracedata.start + ply:GetAimVector() * 80
+    tracedata.filter = ply
+    local tr = util.TraceLine(tracedata)
+    Entity:SetPos(tr.HitPos)
+
+    ply.LIS.Ammo = ply.LIS.Ammo + 1
 end
 
 function LIS_DeleteInventory(ply)
@@ -113,3 +128,4 @@ end
 concommand.Add("lis_inventory_delete", LIS_DeleteInventory)
 concommand.Add("lis_inventory_drop", LIS_DropItem)
 concommand.Add("lis_inventory_open", LIS_OpenInventory)
+concommand.Add("lis_inventory_dropammo", LIS_DropAmmo)
