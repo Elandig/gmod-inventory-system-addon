@@ -17,10 +17,11 @@ function LIS.CreateCompactInventory(data)
     frame:SetSize(rw*width, rh*height)
     frame:SetPos(rw*pos_x, rh*pos_y+height) -- Set window position/Add height for the animation
     frame:SetColor(LIS.CONFIG.PrimaryAccentColor)
+    frame:EnableWindowSwitchButton("compact")
     frame:UpdateRender()
     frame:MoveTo(rw*pos_x, rh*pos_y, anim_time) -- Animation - Move to the original position
 
-    local base = frame:GetBase()
+    local base = frame.background_canvas
     local b_width, b_height = base:GetSize()
 
     local itemlist = vgui.Create("lis_itemlist", base)
@@ -29,14 +30,14 @@ function LIS.CreateCompactInventory(data)
 
     -- Optional mouse toggle closing
     if LIS.CONFIG.MouseToggle then
-        hook.Add("GUIMousePressed", "closeCompactInventory", function(cmd)
+        hook.Add("GUIMousePressed", "LIS_closeCompactInventory", function(cmd)
             if frame ~= nil then
                 frame:MoveTo(rw*pos_x, rh*pos_y+height, anim_time, 0, -1, function()
                         frame:Close()
-                        hook.Remove("GUIMousePressed", "closeCompactInventory")
+                        hook.Remove("GUIMousePressed", "LIS_closeCompactInventory")
                 end)
             else
-                hook.Remove("GUIMousePressed", "closeCompactInventory")
+                hook.Remove("GUIMousePressed", "LIS_closeCompactInventory")
             end
         end)
     end
