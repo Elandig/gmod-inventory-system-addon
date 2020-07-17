@@ -41,4 +41,8 @@ function LIS.CreateCompactInventory(data)
             end
         end)
     end
+
+    -- Callback to refresh inventory if item drop failed
+    return itemlist.cb_drop_failed
+
 end
