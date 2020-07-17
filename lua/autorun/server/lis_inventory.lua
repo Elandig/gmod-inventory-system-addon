@@ -1,5 +1,6 @@
 util.AddNetworkString("LIS_DropInventoryItem")
 util.AddNetworkString("LIS_DrawPlayerInventory")
+util.AddNetworkString("LIS_InventoryItemDropFailed")
 
 hook.Add("PlayerSpawn", "LIS_GiveSWEP", function(ply)
     if LIS.CONFIG.SpawnWithSWEP then
@@ -24,11 +25,16 @@ net.Receive("LIS_DropInventoryItem", function(len, ply)
     LIS_DropItem(ply, "lis_inventory_drop", {id})
 end)
 
-function LIS_OpenInventory(ply)
+local function formatInventoryData(ply)
     local data = {}
     for _,v in pairs(ply:LIS_GetInventory()) do
         table.insert( data, {v.Class, v.Model})
     end
+    return data
+end
+
+function LIS_OpenInventory(ply)
+    local data = formatInventoryData(ply)
 
     net.Start("LIS_DrawPlayerInventory")
     net.WriteUInt(LIS.CONFIG.InventoryStyle, 16)
@@ -39,7 +45,16 @@ end
 function LIS_DropItem(ply, cmd, args)
     local id = tonumber( args[1], 10 )
     local item = ply:LIS_GetInventory()[id]
-    if !id or ply:LIS_GetInventory()[id] == nil then print("Nope!") return end
+
+    if !id or ply:LIS_GetInventory()[id] == nil then
+
+        local data = formatInventoryData(ply)
+        net.Start("LIS_InventoryItemDropFailed")
+        net.WriteTable(data)
+        net.Send(ply)
+        return
+
+    end
 
     local Entity = ents.Create(item.Class)
     duplicator.DoGeneric(Entity, item)
