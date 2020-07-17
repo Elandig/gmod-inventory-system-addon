@@ -12,6 +12,9 @@ function PANEL:Init()
     self.canvas = vgui.Create("DPanel", self)
     self.canvas:SetSize(width, height)
     self.canvas.Paint = function () end
+    self.drop_callback = function () end
+    self.data = {}
+    self.onlyOnce = false
 
 end
 
@@ -68,6 +71,8 @@ end
 
 function PANEL:AddItems(data)
 
+    self.data = data
+
     -- Constants
     local SO = icon_size+offset 
     local rw, rh = ScrW()/1920, ScrH()/1080
@@ -81,7 +86,7 @@ function PANEL:AddItems(data)
 
         local w, h = self.canvas:GetSize()
 
-        self.size = #data
+        self.size = #self.data
         self.pages = math.floor((self.size-1)/(AR[1]*AR[2]))
         self.canvas:SetSize(w+w*(self.pages+1), h)
 
@@ -94,8 +99,6 @@ function PANEL:AddItems(data)
         self.canvas:SetPos(x-width*self.page, y)
 
     end
-
-    local function isAnimLocked() return self.lock end
 
     local function createItemList(state)
 
@@ -119,7 +122,8 @@ function PANEL:AddItems(data)
         local items = {}
         local page = 0
         local l_page_ind = 0
-        for i, v in pairs(data) do
+        local i = 1
+        for _i, v in pairs(self.data) do
 
             local item = vgui.Create("DPanel", self.canvas)
             item:SetSize(rw*icon_size, rh*icon_size)
@@ -141,25 +145,34 @@ function PANEL:AddItems(data)
             icon:SetSize(rw*icon_size, rh*icon_size)
             icon:SetModel(v[2])
 
+            -- We can't access the current scope inside the icon:DoClick()
+            local _self = self
+
             function icon:DoClick()
 
-                if isAnimLocked() then return end
+                if _self.lock then return end
 
                 net.Start("LIS_DropInventoryItem")
-                net.WriteUInt(i, 16)
+                net.WriteUInt(_i, 16)
                 net.SendToServer()
-                table.remove(data, i)
+                table.remove(_self.data, _i)
                 createItemList(true)
 
             end
+
+            i = i + 1
 
         end
 
     end
 
-    createItemList()
+    self.cb_drop_failed = function(data)
+        self.data = data
+        createItemList(true)
+    end
 
+    createItemList(self.onlyOnce)
+    self.onlyOnce = true
 end
-
 
 vgui.Register("lis_itemlist", PANEL, "DPanel")
